@@ -11,11 +11,11 @@ output:
     toc_depth: 3
     code_folding: hide
 ---
-#IntroductionToTidyverse
-##LIBRARIES
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(message=FALSE,warning=FALSE, cache=TRUE)
 ```
+#IntroductionToTidyverse
 ##LIBRARIES
 ```{r}
 
