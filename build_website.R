@@ -11,10 +11,7 @@ rmarkdown::render_site(encoding = 'UTF-8')
 # Step 2: Encode Journal.html ---------------------------------------------
 # Encrypt
 
-            
-
-
-
+          
 
 
 
