@@ -426,13 +426,13 @@ div.tocify {
 <pre class="r"><code>library(tidyverse)
 library(readxl)
 library(lubridate)</code></pre>
-<p>#DATA_TABLES</p>
+<p>##DATA_TABLES</p>
 <pre class="r"><code>bikes_tbl &lt;- readxl:: read_excel(path = &quot;DS-101/DS_101/00_data/01_bike_sales/01_raw_data/bikes.xlsx&quot;)
 
 orderlines_tbl &lt;- readxl::read_excel(&quot;DS-101/DS_101/00_data/01_bike_sales/01_raw_data/orderlines.xlsx&quot;)
 
 bikeshops_tbl  &lt;- readxl::read_excel(&quot;DS-101/DS_101/00_data/01_bike_sales/01_raw_data/bikeshops.xlsx&quot;)</code></pre>
-<p>#Data Wrangling and Plotting</p>
+<p>##Data Wrangling and Plotting</p>
 <pre class="r"><code>bike_orderlines_wrangled_city_separated_tbl &lt;- bike_orderlines_joined_tbl %&gt;%
   # 5.1 Separate category name
   separate(col    = category,
@@ -568,7 +568,7 @@ theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
 ##  - attr(*, &quot;class&quot;)= chr [1:2] &quot;theme&quot; &quot;gg&quot;
 ##  - attr(*, &quot;complete&quot;)= logi FALSE
 ##  - attr(*, &quot;validate&quot;)= logi TRUE</code></pre>
-<p>#Writing files</p>
+<p>##Writing files</p>
 <pre class="r"><code># 7.1 Excel ----
 
 library(&quot;writexl&quot;)
@@ -582,6 +582,321 @@ sales_by_state_year_tbl%&gt;%
 # 7.3 RDS ----
 sales_by_state_year_tbl %&gt;% 
   write_rds(&quot;DS-101/DS_101/00_data/01_bike_sales/02_wrangled_data/bike_orderlines.rds&quot;)</code></pre>
+<p>#Data Acquistion ##Libraries</p>
+<pre class="r"><code>library(RSQLite)
+library(dplyr)
+library(httr)
+library(glue)
+library(jsonlite)
+library(keyring)
+library(rvest)
+library(stringr)
+library(purrr)
+library(xopen)
+library(stringi)
+library(tibble)</code></pre>
+<p>##TASK1_API_Get_Data</p>
+<pre class="r"><code>url= &quot;https://api.coinpaprika.com/v1/coins/btc-bitcoin&quot;
+resp &lt;- GET(url)
+rawToChar(resp$content)</code></pre>
+<pre><code>## [1] &quot;{\&quot;id\&quot;:\&quot;btc-bitcoin\&quot;,\&quot;name\&quot;:\&quot;Bitcoin\&quot;,\&quot;symbol\&quot;:\&quot;BTC\&quot;,\&quot;rank\&quot;:1,\&quot;is_new\&quot;:false,\&quot;is_active\&quot;:true,\&quot;type\&quot;:\&quot;coin\&quot;,\&quot;tags\&quot;:[{\&quot;id\&quot;:\&quot;segwit\&quot;,\&quot;name\&quot;:\&quot;Segwit\&quot;,\&quot;coin_counter\&quot;:10,\&quot;ico_counter\&quot;:0},{\&quot;id\&quot;:\&quot;cryptocurrency\&quot;,\&quot;name\&quot;:\&quot;Cryptocurrency\&quot;,\&quot;coin_counter\&quot;:875,\&quot;ico_counter\&quot;:38},{\&quot;id\&quot;:\&quot;proof-of-work\&quot;,\&quot;name\&quot;:\&quot;Proof Of Work\&quot;,\&quot;coin_counter\&quot;:463,\&quot;ico_counter\&quot;:15},{\&quot;id\&quot;:\&quot;payments\&quot;,\&quot;name\&quot;:\&quot;Payments\&quot;,\&quot;coin_counter\&quot;:212,\&quot;ico_counter\&quot;:39},{\&quot;id\&quot;:\&quot;sha256\&quot;,\&quot;name\&quot;:\&quot;Sha256\&quot;,\&quot;coin_counter\&quot;:49,\&quot;ico_counter\&quot;:1},{\&quot;id\&quot;:\&quot;mining\&quot;,\&quot;name\&quot;:\&quot;Mining\&quot;,\&quot;coin_counter\&quot;:332,\&quot;ico_counter\&quot;:17},{\&quot;id\&quot;:\&quot;lightning-network\&quot;,\&quot;name\&quot;:\&quot;Lightning Network\&quot;,\&quot;coin_counter\&quot;:7,\&quot;ico_counter\&quot;:0}],\&quot;team\&quot;:[{\&quot;id\&quot;:\&quot;satoshi-nakamoto\&quot;,\&quot;name\&quot;:\&quot;Satoshi Nakamoto\&quot;,\&quot;position\&quot;:\&quot;Founder\&quot;},{\&quot;id\&quot;:\&quot;wladimir-j-van-der-laan\&quot;,\&quot;name\&quot;:\&quot;Wladimir J. van der Laan\&quot;,\&quot;position\&quot;:\&quot;Blockchain Developer\&quot;},{\&quot;id\&quot;:\&quot;jonas-schnelli\&quot;,\&quot;name\&quot;:\&quot;Jonas Schnelli\&quot;,\&quot;position\&quot;:\&quot;Blockchain Developer\&quot;},{\&quot;id\&quot;:\&quot;marco-falke\&quot;,\&quot;name\&quot;:\&quot;Marco Falke\&quot;,\&quot;position\&quot;:\&quot;Blockchain Developer\&quot;}],\&quot;description\&quot;:\&quot;Bitcoin is a cryptocurrency and worldwide payment system. It is the first decentralized digital currency, as the system works without a central bank or single administrator.\&quot;,\&quot;message\&quot;:\&quot;\&quot;,\&quot;open_source\&quot;:true,\&quot;started_at\&quot;:\&quot;2009-01-03T00:00:00Z\&quot;,\&quot;development_status\&quot;:\&quot;Working product\&quot;,\&quot;hardware_wallet\&quot;:true,\&quot;proof_type\&quot;:\&quot;Proof of Work\&quot;,\&quot;org_structure\&quot;:\&quot;Decentralized\&quot;,\&quot;hash_algorithm\&quot;:\&quot;SHA256\&quot;,\&quot;links\&quot;:{\&quot;explorer\&quot;:[\&quot;https://blockchair.com/bitcoin\&quot;,\&quot;http://blockchain.com/explorer\&quot;,\&quot;https://blockstream.info/\&quot;,\&quot;https://live.blockcypher.com/btc/\&quot;,\&quot;https://btc.cryptoid.info/btc/\&quot;],\&quot;facebook\&quot;:[\&quot;https://www.facebook.com/bitcoins/\&quot;],\&quot;reddit\&quot;:[\&quot;https://www.reddit.com/r/bitcoin\&quot;],\&quot;source_code\&quot;:[\&quot;https://github.com/bitcoin/bitcoin\&quot;],\&quot;website\&quot;:[\&quot;https://bitcoin.org/\&quot;],\&quot;youtube\&quot;:[\&quot;https://www.youtube.com/watch?v=Gc2en3nHxA4\\u0026\&quot;]},\&quot;links_extended\&quot;:[{\&quot;url\&quot;:\&quot;https://bitcoin.org/en/blog\&quot;,\&quot;type\&quot;:\&quot;blog\&quot;},{\&quot;url\&quot;:\&quot;https://blockchair.com/bitcoin\&quot;,\&quot;type\&quot;:\&quot;explorer\&quot;},{\&quot;url\&quot;:\&quot;http://blockchain.com/explorer\&quot;,\&quot;type\&quot;:\&quot;explorer\&quot;},{\&quot;url\&quot;:\&quot;https://blockstream.info/\&quot;,\&quot;type\&quot;:\&quot;explorer\&quot;},{\&quot;url\&quot;:\&quot;https://live.blockcypher.com/btc/\&quot;,\&quot;type\&quot;:\&quot;explorer\&quot;},{\&quot;url\&quot;:\&quot;https://btc.cryptoid.info/btc/\&quot;,\&quot;type\&quot;:\&quot;explorer\&quot;},{\&quot;url\&quot;:\&quot;https://www.facebook.com/bitcoins/\&quot;,\&quot;type\&quot;:\&quot;facebook\&quot;},{\&quot;url\&quot;:\&quot;https://bitcointalk.org\&quot;,\&quot;type\&quot;:\&quot;message_board\&quot;},{\&quot;url\&quot;:\&quot;https://www.reddit.com/r/bitcoin\&quot;,\&quot;type\&quot;:\&quot;reddit\&quot;,\&quot;stats\&quot;:{\&quot;subscribers\&quot;:1793841}},{\&quot;url\&quot;:\&quot;https://github.com/bitcoin/bitcoin\&quot;,\&quot;type\&quot;:\&quot;source_code\&quot;,\&quot;stats\&quot;:{\&quot;contributors\&quot;:930,\&quot;stars\&quot;:46340}},{\&quot;url\&quot;:\&quot;https://twitter.com/bitcoincoreorg\&quot;,\&quot;type\&quot;:\&quot;twitter\&quot;,\&quot;stats\&quot;:{\&quot;followers\&quot;:101863}},{\&quot;url\&quot;:\&quot;https://electrum.org/#download\&quot;,\&quot;type\&quot;:\&quot;wallet\&quot;},{\&quot;url\&quot;:\&quot;https://bitcoin.org/\&quot;,\&quot;type\&quot;:\&quot;website\&quot;},{\&quot;url\&quot;:\&quot;https://www.youtube.com/watch?v=Gc2en3nHxA4\\u0026\&quot;,\&quot;type\&quot;:\&quot;youtube\&quot;}],\&quot;whitepaper\&quot;:{\&quot;link\&quot;:\&quot;https://static.coinpaprika.com/storage/cdn/whitepapers/215.pdf\&quot;,\&quot;thumbnail\&quot;:\&quot;https://static.coinpaprika.com/storage/cdn/whitepapers/217.jpg\&quot;},\&quot;first_data_at\&quot;:\&quot;2010-07-17T00:00:00Z\&quot;,\&quot;last_data_at\&quot;:\&quot;2020-12-04T21:40:00Z\&quot;}&quot;</code></pre>
+<pre class="r"><code>resp %&gt;% 
+  .$content %&gt;% 
+  rawToChar() %&gt;% 
+  fromJSON()</code></pre>
+<pre><code>## $id
+## [1] &quot;btc-bitcoin&quot;
+## 
+## $name
+## [1] &quot;Bitcoin&quot;
+## 
+## $symbol
+## [1] &quot;BTC&quot;
+## 
+## $rank
+## [1] 1
+## 
+## $is_new
+## [1] FALSE
+## 
+## $is_active
+## [1] TRUE
+## 
+## $type
+## [1] &quot;coin&quot;
+## 
+## $tags
+##                  id              name coin_counter ico_counter
+## 1            segwit            Segwit           10           0
+## 2    cryptocurrency    Cryptocurrency          875          38
+## 3     proof-of-work     Proof Of Work          463          15
+## 4          payments          Payments          212          39
+## 5            sha256            Sha256           49           1
+## 6            mining            Mining          332          17
+## 7 lightning-network Lightning Network            7           0
+## 
+## $team
+##                        id                     name             position
+## 1        satoshi-nakamoto         Satoshi Nakamoto              Founder
+## 2 wladimir-j-van-der-laan Wladimir J. van der Laan Blockchain Developer
+## 3          jonas-schnelli           Jonas Schnelli Blockchain Developer
+## 4             marco-falke              Marco Falke Blockchain Developer
+## 
+## $description
+## [1] &quot;Bitcoin is a cryptocurrency and worldwide payment system. It is the first decentralized digital currency, as the system works without a central bank or single administrator.&quot;
+## 
+## $message
+## [1] &quot;&quot;
+## 
+## $open_source
+## [1] TRUE
+## 
+## $started_at
+## [1] &quot;2009-01-03T00:00:00Z&quot;
+## 
+## $development_status
+## [1] &quot;Working product&quot;
+## 
+## $hardware_wallet
+## [1] TRUE
+## 
+## $proof_type
+## [1] &quot;Proof of Work&quot;
+## 
+## $org_structure
+## [1] &quot;Decentralized&quot;
+## 
+## $hash_algorithm
+## [1] &quot;SHA256&quot;
+## 
+## $links
+## $links$explorer
+## [1] &quot;https://blockchair.com/bitcoin&quot;    &quot;http://blockchain.com/explorer&quot;   
+## [3] &quot;https://blockstream.info/&quot;         &quot;https://live.blockcypher.com/btc/&quot;
+## [5] &quot;https://btc.cryptoid.info/btc/&quot;   
+## 
+## $links$facebook
+## [1] &quot;https://www.facebook.com/bitcoins/&quot;
+## 
+## $links$reddit
+## [1] &quot;https://www.reddit.com/r/bitcoin&quot;
+## 
+## $links$source_code
+## [1] &quot;https://github.com/bitcoin/bitcoin&quot;
+## 
+## $links$website
+## [1] &quot;https://bitcoin.org/&quot;
+## 
+## $links$youtube
+## [1] &quot;https://www.youtube.com/watch?v=Gc2en3nHxA4&amp;&quot;
+## 
+## 
+## $links_extended
+##                                             url          type stats.subscribers
+## 1                   https://bitcoin.org/en/blog          blog                NA
+## 2                https://blockchair.com/bitcoin      explorer                NA
+## 3                http://blockchain.com/explorer      explorer                NA
+## 4                     https://blockstream.info/      explorer                NA
+## 5             https://live.blockcypher.com/btc/      explorer                NA
+## 6                https://btc.cryptoid.info/btc/      explorer                NA
+## 7            https://www.facebook.com/bitcoins/      facebook                NA
+## 8                       https://bitcointalk.org message_board                NA
+## 9              https://www.reddit.com/r/bitcoin        reddit           1793841
+## 10           https://github.com/bitcoin/bitcoin   source_code                NA
+## 11           https://twitter.com/bitcoincoreorg       twitter                NA
+## 12               https://electrum.org/#download        wallet                NA
+## 13                         https://bitcoin.org/       website                NA
+## 14 https://www.youtube.com/watch?v=Gc2en3nHxA4&amp;       youtube                NA
+##    stats.contributors stats.stars stats.followers
+## 1                  NA          NA              NA
+## 2                  NA          NA              NA
+## 3                  NA          NA              NA
+## 4                  NA          NA              NA
+## 5                  NA          NA              NA
+## 6                  NA          NA              NA
+## 7                  NA          NA              NA
+## 8                  NA          NA              NA
+## 9                  NA          NA              NA
+## 10                930       46340              NA
+## 11                 NA          NA          101863
+## 12                 NA          NA              NA
+## 13                 NA          NA              NA
+## 14                 NA          NA              NA
+## 
+## $whitepaper
+## $whitepaper$link
+## [1] &quot;https://static.coinpaprika.com/storage/cdn/whitepapers/215.pdf&quot;
+## 
+## $whitepaper$thumbnail
+## [1] &quot;https://static.coinpaprika.com/storage/cdn/whitepapers/217.jpg&quot;
+## 
+## 
+## $first_data_at
+## [1] &quot;2010-07-17T00:00:00Z&quot;
+## 
+## $last_data_at
+## [1] &quot;2020-12-04T21:40:00Z&quot;</code></pre>
+<p>##TASK2_Collecting_Data_from_website</p>
+<pre class="r"><code>get_bike_data &lt;- function(url) {
+  
+  html_bike_category &lt;- read_html(url)
+  
+  # Get the URLs
+  bike_url_tbl  &lt;- html_bike_category %&gt;%
+    html_nodes(css = &quot;.catalog-category-bikes__title-text&quot;) %&gt;%
+    html_text()%&gt;%
+    enframe(name = &quot;No.&quot;, value = &quot;Bike.Name&quot;)
+  bike_database_tbl&lt;-bike_url_tbl%&gt;% mutate(price=html_bike_category%&gt;%html_nodes(css =&quot;.catalog-category-bikes__price-title&quot;)%&gt;% html_text())
+}
+url= &quot;https://www.rosebikes.de/ebike&quot;
+bike_tableout&lt;-get_bike_data(url)
+bike_tableout</code></pre>
+<pre><code>## # A tibble: 3 x 3
+##     No. Bike.Name                   price              
+##   &lt;int&gt; &lt;chr&gt;                       &lt;chr&gt;              
+## 1     1 &quot;\nXTRA WATT EVO ALLROAD\n&quot; &quot;\nab 4.299,00 €\n&quot;
+## 2     2 &quot;\nXTRA WATT EVO\n&quot;         &quot;\nab 2.899,00 €\n&quot;
+## 3     3 &quot;\nXTRA WATT EVO X\n&quot;       &quot;\nab 3.399,00 €\n&quot;</code></pre>
+<pre class="r"><code>saveRDS(bike_tableout,&quot;Challenge_TASK2.rds&quot;)</code></pre>
+<p>#Data Visualization ##Time course of the cumulative Covid-19 cases ##Libraries</p>
+<pre class="r"><code>library(scales)
+library(tidyverse)
+library(ggplot2)
+library(lubridate)
+library(readxl)
+library(ggthemes)
+library(dplyr)</code></pre>
+<p>##Plotting Challenge 1</p>
+<pre class="r"><code>covid_data_tbl &lt;- read_csv(&quot;https://opendata.ecdc.europa.eu/covid19/casedistribution/csv&quot;)
+
+#Table for Challenge 1 before plot
+
+  covid_data_select_tbl&lt;- covid_data_tbl %&gt;%
+  select(countriesAndTerritories,cases,dateRep,month,year,day)%&gt;%
+  relocate(year,month,day)%&gt;%
+  filter(year==2020,month&gt;1) %&gt;%
+  filter(day!=1)%&gt;%
+  filter(countriesAndTerritories==&quot;France&quot;|countriesAndTerritories==&quot;Germany&quot;|countriesAndTerritories==&quot;United_Kingdom&quot;|countriesAndTerritories==&quot;Spain&quot;|countriesAndTerritories==&quot;United_States_of_America&quot;)%&gt;%
+  group_by(countriesAndTerritories,month)%&gt;%
+  summarize(totalcases = sum(cases)) %&gt;%
+  ungroup()
+    
+
+covid_data_select_tbl%&gt;%
+
+  
+  ggplot(aes(month ,totalcases, color = countriesAndTerritories)) +
+    
+  
+    geom_smooth(method = &quot;loess&quot;, span = 0.2)+
+
+ 
+  
+  
+
+  scale_y_continuous(labels = scales::dollar_format(scale  = 1/1e6, 
+                                                    prefix = &quot;&quot;, 
+                                                    suffix = &quot;M&quot;)) +
+  scale_x_continuous(breaks = seq(2, 11 , by=1),labels= c(&quot;February&quot;,&quot;March&quot;,&quot;April&quot;,&quot;May&quot;,&quot;June&quot;,&quot;July&quot;,&quot;August&quot;,&quot;September&quot;,&quot;October&quot;,&quot;November&quot;)) +
+ # scale_x_continuous(labels = scales::dollar_format(scale = 1/1e6,
+                                                     #prefix= &quot;&quot;,
+                                                    # suffix= &quot;February&quot;)) +
+   
+labs(
+  title = (&quot;Covid-19 confirmed cases worldwide&quot;),
+  subtitle = (&quot;United States has the highest rate of cases&quot;),
+  caption = &quot;&quot;,
+  x = &quot;(Year 2020)&quot;,
+  y = &quot;Cumulative Cases&quot;,
+  color = &quot;Country&quot;
+
+) +
+  
+    
+geom_label(aes(label = (totalcases)), 
+           hjust = &quot;inward&quot;,
+           size  = 3,
+           color = RColorBrewer::brewer.pal(n = 11, name = &quot;RdBu&quot;)[11]) </code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-9-1.png" width="672" /> ##Libraries</p>
+<pre class="r"><code>library(scales)
+library(tidyverse)
+library(ggplot2)
+library(lubridate)
+library(readxl)
+library(ggthemes)
+library(dplyr)
+library(maps)
+library(ggmap)
+library(maps)
+library(mapdata)
+library(devtools)</code></pre>
+<p>##Mortality Rate on world map</p>
+<pre class="r"><code>covid_data_tbl&lt;- read_csv(&quot;https://opendata.ecdc.europa.eu/covid19/casedistribution/csv&quot;)
+
+#Tables for Challenge 2 before plotting
+covid_data_tbl%&gt;%
+  
+  mutate(across(countriesAndTerritories, str_replace_all, &quot;_&quot;, &quot; &quot;)) %&gt;%
+  mutate(countriesAndTerritories = case_when(
+    
+    countriesAndTerritories == &quot;United Kingdom&quot; ~ &quot;UK&quot;,
+    countriesAndTerritories == &quot;United States of America&quot; ~ &quot;USA&quot;,
+    countriesAndTerritories == &quot;Czechia&quot; ~ &quot;Czech Republic&quot;,
+    TRUE ~ countriesAndTerritories
+  ))</code></pre>
+<pre><code>## # A tibble: 59,770 x 12
+##    dateRep   day month  year cases deaths countriesAndTer~ geoId
+##    &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;            &lt;chr&gt;
+##  1 04/12/~     4    12  2020   119      5 Afghanistan      AF   
+##  2 03/12/~     3    12  2020   202     19 Afghanistan      AF   
+##  3 02/12/~     2    12  2020   400     48 Afghanistan      AF   
+##  4 01/12/~     1    12  2020   272     11 Afghanistan      AF   
+##  5 30/11/~    30    11  2020     0      0 Afghanistan      AF   
+##  6 29/11/~    29    11  2020   228     11 Afghanistan      AF   
+##  7 28/11/~    28    11  2020   214     15 Afghanistan      AF   
+##  8 27/11/~    27    11  2020     0      0 Afghanistan      AF   
+##  9 26/11/~    26    11  2020   200     12 Afghanistan      AF   
+## 10 25/11/~    25    11  2020   185     13 Afghanistan      AF   
+## # ... with 59,760 more rows, and 4 more variables: countryterritoryCode &lt;chr&gt;,
+## #   popData2019 &lt;dbl&gt;, continentExp &lt;chr&gt;,
+## #   `Cumulative_number_for_14_days_of_COVID-19_cases_per_100000` &lt;dbl&gt;</code></pre>
+<pre class="r"><code>covid_world_mortality_rate_tbl&lt;-covid_data_tbl%&gt;%
+  mutate(mortalityrate = (deaths/popData2019)*100) %&gt;% 
+  group_by(year,countriesAndTerritories) %&gt;% 
+  summarize(Mortality_Rates = sum(mortalityrate)) %&gt;%
+  ungroup()%&gt;%
+  select(countriesAndTerritories,Mortality_Rates,year)
+
+
+#plotting without data
+world &lt;-   map_data(&quot;world&quot;)
+
+ggplot() +
+  geom_map(
+    data = world, map = world,
+    aes(long, lat, map_id = region) ,color = &quot;black&quot;, fill = &quot;lightgray&quot;, size = 0.1
+  ) </code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<pre class="r"><code>covid_world_mortality_rate_countries_tbl&lt;-world%&gt;%
+  
+  mutate(across(region, str_replace_all, &quot;_&quot;, &quot; &quot;) )%&gt;%
+  mutate(region= case_when(
+    
+    region==  &quot;UK&quot;~&quot;United_Kingdom&quot; ,
+    region == &quot;USA&quot;~&quot;United_States_of_America&quot; ,
+    region == &quot;Czechia&quot;~&quot;Czech_Republic&quot;,
+    TRUE ~ region
+  ))
+
+covid_world_mortality_rate_countries_tbl&lt;-covid_world_mortality_rate_countries_tbl %&gt;%
+  rename(countriesAndTerritories = region)
+
+    #Combined table before plotting 
+    covid_combined_world_mortality_rate &lt;- left_join(covid_world_mortality_rate_countries_tbl,covid_world_mortality_rate_tbl, by = c(&quot;countriesAndTerritories&quot;))
+
+    ggplot(data = covid_combined_world_mortality_rate) +
+    geom_polygon(aes(x = long, y = lat, group = group, fill = Mortality_Rates), color= &quot;white&quot;)</code></pre>
+<p><img src="journal_files/figure-html/unnamed-chunk-11-2.png" width="672" /></p>
 
 
 
