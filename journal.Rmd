@@ -9,46 +9,153 @@ output:
     collapsed: false
     number_sections: true
     toc_depth: 3
-    #code_folding: hide
+    code_folding: hide
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(message=FALSE,warning=FALSE, cache=TRUE)
 ```
-
-**IMPORTANT:** You can delete everything in here and start fresh. You might want to start by not deleting anything above this line until you know what that stuff is doing.
-
-This is an `.Rmd` file. It is plain text with special features. Any time you write just like this, it will be compiled to normal text in the website. If you put a \# in front of your text, it will create a top level-header.
-
-# My first post
-
-Last compiled: `r Sys.Date()`
-
-Notice that whatever you define as a top level header, automatically gets put into the table of contents bar on the left. 
-
-## Second level header
-
-You can add more headers by adding more hashtags. These won't be put into the table of contents
-
-### third level header
-
-Here's an even lower level header
-
-# My second post (note the order)
-
-Last compiled: `r Sys.Date()`
-
-I'm writing this tutorial going from the top down. And, this is how it will be printed. So, notice the second post is second in the list. If you want your most recent post to be at the top, then make a new post starting at the top. If you want the oldest first, do, then keep adding to the bottom
-
-# Adding R stuff
-
-So far this is just a blog where you can write in plain text and serve your writing to a webpage. One of the main purposes of this lab journal is to record your progress learning R. The reason I am asking you to use this process is because you can both make a website, and a lab journal, and learn R all in R-studio. This makes everything really convenient and in the same place. 
-
-So, let's say you are learning how to make a histogram in R. For example, maybe you want to sample 100 numbers from a normal distribution with mean = 0, and standard deviation = 1, and then you want to plot a histogram. You can do this right here by using an r code block, like this:
-
+#Introduction
+##LIBRARIES
 ```{r}
-samples <- rnorm(100, mean=0, sd=1)
-hist(samples)
+
+
+library(tidyverse)
+library(readxl)
+library(lubridate)
+
 ```
 
-When you knit this R Markdown document, you will see that the histogram is printed to the page, along with the R code. This document can be set up to hide the R code in the webpage, just delete the comment (hashtag) from the cold folding option in the yaml header up top. For purposes of letting yourself see the code, and me see the code, best to keep it the way that it is. You'll learn that all of these things and more can be customized in each R code block.
+#DATA_TABLES
+```{r}
+
+
+bikes_tbl <- readxl:: read_excel(path = "DS-101/DS_101/00_data/01_bike_sales/01_raw_data/bikes.xlsx")
+
+orderlines_tbl <- readxl::read_excel("DS-101/DS_101/00_data/01_bike_sales/01_raw_data/orderlines.xlsx")
+
+bikeshops_tbl  <- readxl::read_excel("DS-101/DS_101/00_data/01_bike_sales/01_raw_data/bikeshops.xlsx")
+
+
+```
+
+#Data Wrangling and Plotting
+```{r}
+
+bike_orderlines_wrangled_city_separated_tbl <- bike_orderlines_joined_tbl %>%
+  # 5.1 Separate category name
+  separate(col    = category,
+           into   = c("category.1", "category.2", "category.3"),
+           sep    = " - ") %>% 
+  
+  # Separate city and state 
+  
+  separate(col    = location,
+           into   = c("City", "State"),
+           sep    = ", ")%>% 
+  
+  # 5.2 Add the total price (price * quantity) 
+  # Add a column to a tibble that uses a formula-style calculation of other columns
+  mutate(total.price = quantity* price) %>%
+  
+  # 5.3 Optional: Reorganize. Using select to grab or remove unnecessary columns
+  # 5.3.1 by exact column name
+  select(-...1, -gender) %>%
+  
+  # 5.3.2 by a pattern
+  # You can use the select_helpers to define patterns. 
+  # Type ?ends_with and click on Select helpers in the documentation
+  select(-ends_with(".id"))%>%
+  
+  # 5.3.3 Actually we need the column "order.id". Let's bind it back to the data
+  bind_cols(bike_orderlines_joined_tbl %>% select(order.id)) %>% 
+  
+  # 5.3.4 You can reorder the data by selecting the columns in your desired order.
+  # You can use select_helpers like contains() or everything()
+  select(order.id, contains("order"), contains("model"), contains("category"),
+         price, quantity, total.price,
+         everything()) %>%
+  
+  # 5.4 Rename columns because we actually wanted underscores instead of the dots
+  # (one at the time vs. multiple at once)
+  rename(bikeshop = name) %>%
+  set_names(names(.) %>% str_replace_all("\\.", "_"))
+# 6.2 Sales by Year and State ----
+# Step 1 - Manipulate
+sales_by_state_year_tbl <-bike_orderlines_wrangled_city_separated_tbl %>%
+  
+  # Select columns and add a year
+  select(order_date, total_price, State) %>%
+  mutate(year = year(order_date)) %>%
+  
+  # Group by and summarize year and main catgegory
+  group_by(State, year) %>%
+  summarise(sales = sum(total_price)) %>%
+  ungroup() %>%
+  
+  # Format $ Text
+  mutate(sales_text = scales::dollar(sales, big.mark = ".", 
+                                     decimal.mark = ",", 
+                                     prefix = "", 
+                                     suffix = " €"))
+
+# Rotate plot: 
+theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  
+  labs(
+    title    = "States revenue by year",
+    x = "", # Override defaults for x and y
+    y = "Revenue"
+  )
+sales_by_state_year_tbl%>%
+  
+  # Set up x, y, fill
+  ggplot(aes(x = year, y = sales, fill = State)) +
+  
+  # Geometries
+  geom_col() + # Run up to here to get a stacked bar plot
+  
+  # Facet
+  facet_wrap(~ State) +
+  
+  # Formatting
+  scale_y_continuous(labels = scales::dollar_format(big.mark = ".", 
+                                                    decimal.mark = ",", 
+                                                    prefix = "", 
+                                                    suffix = " €")) +
+  labs(
+    title = "Revenue by State and year",
+    subtitle = "Each product category has an upward trend",
+    fill = "State" # Changes the legend name
+  )
+# Rotate plot: 
+theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  
+  labs(
+    title    = "States revenue by year",
+    x = "", # Override defaults for x and y
+    y = "Revenue"
+  )
+
+
+
+
+```
+#Writing files
+
+```{r}
+# 7.1 Excel ----
+
+library("writexl")
+sales_by_state_year_tbl %>%
+  write_xlsx("DS-101/DS_101/00_data/01_bike_sales/02_wrangled_data/bike_orderlines.xlsx")
+
+# 7.2 CSV ----
+sales_by_state_year_tbl%>% 
+  write_csv("DS-101/DS_101/00_data/01_bike_sales/02_wrangled_data/bike_orderlines.csv")
+
+# 7.3 RDS ----
+sales_by_state_year_tbl %>% 
+  write_rds("DS-101/DS_101/00_data/01_bike_sales/02_wrangled_data/bike_orderlines.rds")
+```
+
