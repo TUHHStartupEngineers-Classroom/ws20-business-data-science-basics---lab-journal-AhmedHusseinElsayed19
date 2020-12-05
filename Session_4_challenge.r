@@ -180,7 +180,7 @@ top10_worlwide_patents <- combined_data_3  %>%
                   ungroup() %>%
                   arrange(desc(total_patents_wordwide)) %>% slice(1:10)  
 
-top10_worlwid_top5_upts_ <- top10_worlwide %>% slice(1:5)  
+top10_worlwid_top5_upts_ <- top10_worlwide_patents %>% slice(1:5)  
 
 
 
