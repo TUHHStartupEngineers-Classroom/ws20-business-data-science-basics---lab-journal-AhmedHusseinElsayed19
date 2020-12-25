@@ -6,11 +6,11 @@ library(lubridate)
 
 #DATA_TABLES
 
-bikes_tbl <- readxl:: read_excel(path = "00_data/01_bike_sales/01_raw_data/bikes.xlsx")
+bikes_tbl <- readxl:: read_excel(path = "DS-101/DS_101/00_data/01_bike_sales/01_raw_data/bikes.xlsx")
 
-orderlines_tbl <- readxl::read_excel("00_data/01_bike_sales/01_raw_data/orderlines.xlsx")
+orderlines_tbl <- readxl::read_excel("DS-101/DS_101/00_data/01_bike_sales/01_raw_data/orderlines.xlsx")
 
-bikeshops_tbl  <- readxl::read_excel("00_data/01_bike_sales/01_raw_data/bikeshops.xlsx")
+bikeshops_tbl  <- readxl::read_excel("DS-101/DS_101/00_data/01_bike_sales/01_raw_data/bikeshops.xlsx")
 
 left_join(orderlines_tbl, bikes_tbl, by = c("product.id" = "bike.id"))
 bike_orderlines_joined_tbl <- orderlines_tbl %>%
@@ -253,12 +253,12 @@ theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
 
 library("writexl")
 sales_by_state_year_tbl %>%
-  write_xlsx("00_data/01_bike_sales/02_wrangled_data/bike_orderlines.xlsx")
+  write_xlsx("DS-101/DS_101/00_data/01_bike_sales/02_wrangled_data/bike_orderlines.xlsx")
 
 # 7.2 CSV ----
 sales_by_state_year_tbl%>% 
-  write_csv("00_data/01_bike_sales/02_wrangled_data/bike_orderlines.csv")
+  write_csv("DS-101/DS_101/00_data/01_bike_sales/02_wrangled_data/bike_orderlines.csv")
 
 # 7.3 RDS ----
 sales_by_state_year_tbl %>% 
-  write_rds("00_data/01_bike_sales/02_wrangled_data/bike_orderlines.rds")
+  write_rds("DS-101/DS_101/00_data/01_bike_sales/02_wrangled_data/bike_orderlines.rds")
